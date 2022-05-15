@@ -1,12 +1,21 @@
 import { memo, VFC } from "react";
 import { Space, Button, Card } from "antd";
 import { IFPost } from "../models/Post";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../store/store";
+import { deleteAsyncPost } from "../store/features/postSlice";
 
 type PropTypes = {
   post: IFPost;
 };
 
 const UserPost: VFC<PropTypes> = memo(({ post }) => {
+  const dispatch: AppDispatch = useDispatch();
+
+  const onDeletePost = () => {
+    dispatch(deleteAsyncPost({ userId: `${post.id}` }));
+  };
+
   return (
     <>
       <Card type="inner" title={post.title}>
@@ -20,7 +29,12 @@ const UserPost: VFC<PropTypes> = memo(({ post }) => {
         <Button type="primary" style={{ cursor: "pointer" }}>
           EDIT
         </Button>
-        <Button type="primary" style={{ cursor: "pointer" }} danger>
+        <Button
+          type="primary"
+          style={{ cursor: "pointer" }}
+          onClick={onDeletePost}
+          danger
+        >
           DELETE
         </Button>
       </Space>
