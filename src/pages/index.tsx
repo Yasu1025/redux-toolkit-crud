@@ -9,13 +9,12 @@ import {
   selectLoading,
 } from "../store/features/postSlice";
 import LoadingCard from "./LoadingCard";
-import { IFPost } from "../models/Post";
 import UserPost from "../components/UserPost";
 
 const Home: VFC = memo(() => {
   const [userId, setUserId] = useState("");
-  const post: IFPost[] = useSelector(selectPost);
-  const loading: boolean = useSelector(selectLoading);
+  const post = useSelector(selectPost);
+  const loading = useSelector(selectLoading);
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
 

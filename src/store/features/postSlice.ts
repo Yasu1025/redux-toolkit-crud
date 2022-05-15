@@ -7,12 +7,14 @@ interface IFState {
   post: IFPost[];
   loading: boolean;
   error: any;
+  edit: boolean;
 }
 
 const initialState: IFState = {
   post: [],
   loading: false,
   error: null,
+  edit: false,
 };
 
 export const getAsyncPost = createAsyncThunk(
@@ -47,10 +49,37 @@ export const createAsyncPost = createAsyncThunk(
   }
 );
 
+export const updateAsyncPost = createAsyncThunk(
+  "post/updaePost",
+  async ({
+    userId,
+    values,
+  }: {
+    userId: number;
+    values: {
+      title: string;
+      body: string;
+    };
+  }) => {
+    return axios
+      .put(`https://jsonplaceholder.typicode.com/posts/${userId}`, values, {
+        headers: {
+          accept: "application/json",
+          "Content-type": "application/json",
+        },
+      })
+      .then((res) => res.data);
+  }
+);
+
 const postSlice = createSlice({
   name: "post",
   initialState,
-  reducers: {},
+  reducers: {
+    setEdit: (state, { payload }) => {
+      state.edit = payload.edit;
+    },
+  },
   extraReducers: (bundler) => {
     // get post
     bundler.addCase(getAsyncPost.pending, (state, _) => {
@@ -88,11 +117,26 @@ const postSlice = createSlice({
       state.loading = false;
       state.error = payload;
     });
+    // update post
+    bundler.addCase(updateAsyncPost.pending, (state, _) => {
+      state.loading = true;
+    });
+    bundler.addCase(updateAsyncPost.fulfilled, (state, { payload }) => {
+      state.loading = false;
+      state.post = [payload];
+    });
+    bundler.addCase(updateAsyncPost.rejected, (state, { payload }) => {
+      state.loading = false;
+      state.error = payload;
+    });
   },
 });
+
+export const { setEdit } = postSlice.actions;
 
 export const selectPost = (state: RootState) => state.post.post;
 export const selectLoading = (state: RootState) => state.post.loading;
 export const selectError = (state: RootState) => state.post.error;
+export const selectEdit = (state: RootState) => state.post.edit;
 
 export default postSlice.reducer;
