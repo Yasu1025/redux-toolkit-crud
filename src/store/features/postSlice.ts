@@ -33,6 +33,20 @@ export const deleteAsyncPost = createAsyncThunk(
   }
 );
 
+export const createAsyncPost = createAsyncThunk(
+  "post/createPost",
+  async (values: { title: string; body: string }) => {
+    return axios
+      .post(`https://jsonplaceholder.typicode.com/posts/`, values, {
+        headers: {
+          accept: "application/json",
+          "Content-type": "application/json",
+        },
+      })
+      .then((res) => res.data);
+  }
+);
+
 const postSlice = createSlice({
   name: "post",
   initialState,
@@ -59,6 +73,18 @@ const postSlice = createSlice({
       state.post = payload;
     });
     bundler.addCase(deleteAsyncPost.rejected, (state, { payload }) => {
+      state.loading = false;
+      state.error = payload;
+    });
+    // create post
+    bundler.addCase(createAsyncPost.pending, (state, _) => {
+      state.loading = true;
+    });
+    bundler.addCase(createAsyncPost.fulfilled, (state, { payload }) => {
+      state.loading = false;
+      state.post = [payload];
+    });
+    bundler.addCase(createAsyncPost.rejected, (state, { payload }) => {
       state.loading = false;
       state.error = payload;
     });
